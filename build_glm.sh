@@ -20,11 +20,11 @@ done
 
 export OSTYPE=`uname -s`
 
+# if FC is not defined we default to ifort
 if [ "$FC" = "" ] ; then
-  export FC="ifort"
+  export FC=ifort
 fi
 
-echo $FC
 if [ "$FC" = "ifort" ] ; then
    # for fabm
    FORTRAN_COMPILER="IFORT"
@@ -35,22 +35,23 @@ if [ "$FC" = "ifort" ] ; then
       CPU="intel64"
    fi
 
-  if [ -d /opt/intel/bin ] ; then
-    . /opt/intel/bin/compilervars.sh $CPU
-  fi
-  which ifort >& /dev/null
-  if [ $? != 0 ] ; then
-    echo ifort compiler requested, but not found
-    exit 1
-  fi
-  export PATH="/opt/intel/bin:$PATH"
-  export NETCDFHOME=/opt/intel
+   if [ -d /opt/intel/bin ] ; then
+      . /opt/intel/bin/compilervars.sh $CPU
+   fi
+   which ifort >& /dev/null
+   if [ $? != 0 ] ; then
+      echo ifort compiler requested, but not found
+      exit 1
+   fi
+
+   export PATH="/opt/intel/bin:$PATH"
+   export NETCDFHOME=/opt/intel
 else
    # for fabm
    # if FC is not ifort assume that it is a variant of gfortran
    FORTRAN_COMPILER="GFORTRAN"
 
-  if [ "$OSTYPE" == "Darwin" ] ; then
+   if [ "$OSTYPE" == "Darwin" ] ; then
      if [ "${HOMEBREW}" = "true" ] ; then
        export NETCDFHOME=/usr/local
      else
@@ -111,7 +112,8 @@ if [ "$FABM" = "true" ] ; then
     mkdir build
   fi
   cd build
-  export EXTRA_FFLAGS+=-fPIC
+# export EXTRA_FFLAGS+=-fPIC
+  export FFLAGS+=-fPIC
   if [ "${USE_DL}" = "true" ] ; then
     cmake ${FABMDIR}/src -DBUILD_SHARED_LIBS=1 || exit 1
   else
