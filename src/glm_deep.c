@@ -85,14 +85,9 @@ void do_deep_mixing()
 //LOCALS
     AED_REAL exchk2;
 
-#ifndef _VISUAL_C_
-    // The visual c compiler doesn't like this so must malloc manually
-    AED_REAL Scalars[MaxLayers*(Num_WQ_Vars+2)];
-    AED_REAL tot_diffusivity[MaxLayers];
-#else
     AED_REAL *Scalars;
     AED_REAL *tot_diffusivity;
-#endif
+
     AED_REAL RTimeStep;
     AED_REAL dif_exp;
     AED_REAL NSquared;
@@ -116,13 +111,10 @@ void do_deep_mixing()
     //# Set the local time step
     RTimeStep = noSecs;
 
-#ifdef _VISUAL_C_
-    Scalars = malloc(sizeof(AED_REAL) * MaxLayers*(Num_WQ_Vars+2));
-    tot_diffusivity = malloc(sizeof(AED_REAL) * MaxLayers);
-#endif
+    Scalars = calloc(MaxLayers*(Num_WQ_Vars+2), sizeof(AED_REAL));
+    tot_diffusivity = calloc(MaxLayers, sizeof(AED_REAL));
 
     //# Set up array of diffusable species
-    memset(Scalars, 0, sizeof(Scalars));
     join_scalar_colums(Scalars);
 
     //# Now calculate the turbulent diffusivities
@@ -233,9 +225,7 @@ void do_deep_mixing()
     for (i = 0; i < NumLayers; i++)
         Lake[i].Epsilon += mol_diffusivity[0];
 
-#ifdef _VISUAL_C_
     free(Scalars); free(tot_diffusivity);
-#endif
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
@@ -336,12 +326,8 @@ void do_dissipation()
 {
     AED_REAL cwnsq1 = 12.4;
 
-#ifndef _VISUAL_C_
-    // The visual c compiler doesn't like this so must malloc manually
-    AED_REAL Nsquared[MaxLayers];
-#else
     AED_REAL *Nsquared;
-#endif
+
     AED_REAL CentreMassSML;
     AED_REAL CentreMassMIX;
 
@@ -372,9 +358,7 @@ void do_dissipation()
 
 /*----------------------------------------------------------------------------*/
 
-#ifdef _VISUAL_C_
-    Nsquared = malloc(sizeof(AED_REAL) * MaxLayers);
-#endif
+    Nsquared = calloc(MaxLayers, sizeof(AED_REAL));
 
     /**************************************************************************
      * Estimate rate of working by the wind (Patterson et al. 1977; p3)       *
@@ -390,7 +374,6 @@ void do_dissipation()
      * "XMoment1" is 1st moment, "XMoment0" is 0th moment                     *
      *  XMoment1 is the centre of buoyancy (in metres above bottom)           *
      **************************************************************************/
-    memset(Nsquared, 0, sizeof(Nsquared));
 
     XMoment1 = zero;
     XMoment0 = zero;
@@ -500,9 +483,8 @@ void do_dissipation()
             vel = uStar;
         }
     }
-#ifdef _VISUAL_C_
+
     free(Nsquared);
-#endif
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 

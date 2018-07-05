@@ -283,12 +283,9 @@ void insert(AED_REAL q, AED_REAL di, AED_REAL bsl, AED_REAL temp, AED_REAL salt,
     AED_REAL DBB,DELT,DELB;
     AED_REAL DHLE;
     AED_REAL DT;
-#ifndef _VISUAL_C_
-    // The visual c compiler doesn't like this so must malloc manually
-    AED_REAL DVR[MaxLayers];
-#else
+
     AED_REAL *DVR;
-#endif
+
     AED_REAL DZ;
     AED_REAL F;
     AED_REAL GD;
@@ -311,9 +308,7 @@ void insert(AED_REAL q, AED_REAL di, AED_REAL bsl, AED_REAL temp, AED_REAL salt,
 
 /*----------------------------------------------------------------------------*/
 
-#ifdef _VISUAL_C_
-    DVR = malloc(sizeof(AED_REAL) * MaxLayers);
-#endif
+    DVR = calloc(MaxLayers, sizeof(AED_REAL));
 
     DELT=0.;
     DELB=0.;
@@ -493,8 +488,6 @@ void insert(AED_REAL q, AED_REAL di, AED_REAL bsl, AED_REAL temp, AED_REAL salt,
             Lake[j].Vol1 = Lake[j-1].Vol1 + Lake[j].LayerVol;
     }
 
-#ifdef _VISUAL_C_
     free(DVR);
-#endif
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/

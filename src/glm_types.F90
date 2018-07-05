@@ -141,7 +141,7 @@ SUBROUTINE make_string(s1,s2,len)
    CHARACTER,INTENT(in) :: s2(*)
    CSIZET,INTENT(in)    :: len
 !LOCALS
-   INTEGER :: i
+   CSIZET :: i
 !
 !-------------------------------------------------------------------------------
 !BEGIN

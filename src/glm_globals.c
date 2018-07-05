@@ -235,19 +235,12 @@ void set_c_wqvars_ptr(AED_REAL *iwqv) { WQ_Vars = iwqv; }
 /******************************************************************************/
 void allocate_storage()
 {
-    MphLevelArea =    malloc(sizeof(AED_REAL) * Nmorph);
-    dMphLevelArea =   malloc(sizeof(AED_REAL) * Nmorph);
-    dMphLevelVol =    malloc(sizeof(AED_REAL) * Nmorph);
-    dMphLevelVolda =  malloc(sizeof(AED_REAL) * Nmorph);
-    MphLevelVol =     malloc(sizeof(AED_REAL) * Nmorph);
-    MphLevelVoldash = malloc(sizeof(AED_REAL) * Nmorph);
-
-    memset(MphLevelArea,    0, sizeof(AED_REAL) * Nmorph);
-    memset(dMphLevelArea,   0, sizeof(AED_REAL) * Nmorph);
-    memset(dMphLevelVol,    0, sizeof(AED_REAL) * Nmorph);
-    memset(dMphLevelVolda,  0, sizeof(AED_REAL) * Nmorph);
-    memset(MphLevelVol,     0, sizeof(AED_REAL) * Nmorph);
-    memset(MphLevelVoldash, 0, sizeof(AED_REAL) * Nmorph);
+    MphLevelArea =    calloc(Nmorph, sizeof(AED_REAL));
+    dMphLevelArea =   calloc(Nmorph, sizeof(AED_REAL));
+    dMphLevelVol =    calloc(Nmorph, sizeof(AED_REAL));
+    dMphLevelVolda =  calloc(Nmorph, sizeof(AED_REAL));
+    MphLevelVol =     calloc(Nmorph, sizeof(AED_REAL));
+    MphLevelVoldash = calloc(Nmorph, sizeof(AED_REAL));
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 

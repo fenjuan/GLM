@@ -400,7 +400,7 @@ AED_REAL do_outflows(int jday)
     AED_REAL VolSum = Lake[surfLayer].Vol1; //# Lake volume prior to outflows [m3]
     AED_REAL SeepDraw = 0.0; //# Seepage volume [m3]
 
-    if ( Delta_V == NULL ) Delta_V = malloc(sizeof(AED_REAL) * MaxLayers);
+    if ( Delta_V == NULL ) Delta_V = calloc(MaxLayers, sizeof(AED_REAL));
 
     /**************************************************************************
      * Do withdrawal for each offtake                                         *
@@ -747,9 +747,9 @@ AED_REAL do_inflows()
 
     // Array allocation for WQ in the inflow parcels
     if ( WQ_VarsS == NULL && Num_WQ_Vars > 0)
-         WQ_VarsS = malloc(Num_WQ_Vars * sizeof(AED_REAL));
-    if ( WQ_VarsTmp == NULL ) WQ_VarsTmp = malloc(NumInf * sizeof(wq_partic_t));
-    memset(WQ_VarsS, 0, (Num_WQ_Vars * sizeof(AED_REAL)));
+         WQ_VarsS = calloc(Num_WQ_Vars, sizeof(AED_REAL));
+    if ( WQ_VarsTmp == NULL ) WQ_VarsTmp = calloc(NumInf, sizeof(wq_partic_t));
+
 
     /**************************************************************************
      * Initially:                                                             *

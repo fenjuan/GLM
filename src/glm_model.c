@@ -481,14 +481,12 @@ void do_model_non_avg(int jstart, int nsave)
 void do_model_coupled(int step_start, int step_end,
            AED_REAL *FlowNew, AED_REAL *DrawNew, AED_REAL *elevation, int nsave )
 {
-    //static AED_REAL WithdrawalTemp;
     AED_REAL    SWold, SWnew;
 
    /***************************************************************************
     *CAB Note: these WQ arrays should be sized to Num_WQ_Vars not MaxVars,    *
     *           look into that later ....                                     *
     ***************************************************************************/
-//  AED_REAL SaltNew[MaxInf], TempNew[MaxInf], WQNew[MaxInf * MaxVars];
     AED_REAL WQNew[MaxInf * MaxVars];
 
     int jday, ntot, stepnum, cDays;

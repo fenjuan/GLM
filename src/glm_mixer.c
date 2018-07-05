@@ -1066,12 +1066,7 @@ void init_mixer()
  ******************************************************************************/
 void do_mixing()
 {
-#ifndef _VISUAL_C_
-    // The visual c compiler doesn't like this so must malloc manually
-    AED_REAL WQ_VarsM[Num_WQ_Vars];
-#else
     AED_REAL *WQ_VarsM;
-#endif
 
     int i, wqvidx;                //# Counters
     int Meta_topLayer;            //# Index for top layer of hypolimnion
@@ -1082,9 +1077,7 @@ void do_mixing()
 
 /*----------------------------------------------------------------------------*/
 
-#ifdef _VISUAL_C_
-    WQ_VarsM = malloc(sizeof(AED_REAL) * Num_WQ_Vars);
-#endif
+    WQ_VarsM = calloc(Num_WQ_Vars, sizeof(AED_REAL));
 
     Mixer_Count++;  //# Increment mixing step counter
     _DumpLake(0,0);
@@ -1159,8 +1152,6 @@ void do_mixing()
     }
     _DumpLake(1,res);
 
-#ifdef _VISUAL_C_
     free(WQ_VarsM);
-#endif
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/

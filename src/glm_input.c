@@ -445,7 +445,7 @@ void open_met_file(const char *fname, int snow_sw, int rain_sw,
 
     n_steps = 86400.0 / timestep;
     // Allocate sub daily met array with an element for each timestep
-    submet = malloc(n_steps * sizeof(MetDataType));
+    submet = calloc(n_steps, sizeof(MetDataType));
 
     if (subdaily) {
         if (rad_mode == 0) { //Then need to determine rad_mode from longwave type

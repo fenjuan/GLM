@@ -578,7 +578,7 @@ void init_glm(int *jstart, char *outp_dir, char *outp_fn, int *nsave)
 
     if ( csv_point_frombot == NULL && csv_point_nlevs > 0) {
         // CAB this is a potential source of a memory leak.
-        csv_point_frombot = malloc(sizeof(LOGICAL)*csv_point_nlevs);
+        csv_point_frombot = calloc(csv_point_nlevs, sizeof(LOGICAL));
         for (i = 0; i < csv_point_nlevs; i++) csv_point_frombot[i] = TRUE;
     }
 
@@ -693,8 +693,7 @@ void init_glm(int *jstart, char *outp_dir, char *outp_fn, int *nsave)
     if ( sed_reflectivity == NULL ) {
         int t_zones = 2;
         if ( n_zones > 1 ) t_zones = n_zones;
-        sed_reflectivity = malloc(t_zones*sizeof(AED_REAL));
-        memset(sed_reflectivity, 0, t_zones*sizeof(AED_REAL));
+        sed_reflectivity = calloc(t_zones, sizeof(AED_REAL));
     }
 
     if ( n_zones > 0 && zone_heights != NULL ) {
@@ -708,7 +707,7 @@ void init_glm(int *jstart, char *outp_dir, char *outp_fn, int *nsave)
             zone_heights[n_zones++] = (max_elev-base_elev)+1;
         }
 
-        zone_area = malloc(n_zones * sizeof(AED_REAL));
+        zone_area = calloc(n_zones, sizeof(AED_REAL));
     }
 
     /**************************************************************************
@@ -720,20 +719,16 @@ void init_glm(int *jstart, char *outp_dir, char *outp_fn, int *nsave)
         if ( n_zones > 1 ) t_zones = n_zones;
 
         if (sed_roughness == NULL) {
-            sed_roughness = malloc(t_zones*sizeof(AED_REAL));
-            memset(sed_roughness, 0, t_zones*sizeof(AED_REAL));
+            sed_roughness = calloc(t_zones, sizeof(AED_REAL));
         }
         if (sed_temp_mean == NULL) {
-            sed_temp_mean = malloc(t_zones*sizeof(AED_REAL));
-            memset(sed_temp_mean, 0, t_zones*sizeof(AED_REAL));
+            sed_temp_mean = calloc(t_zones, sizeof(AED_REAL));
         }
         if (sed_temp_amplitude == NULL) {
-            sed_temp_amplitude = malloc(t_zones*sizeof(AED_REAL));
-            memset(sed_temp_amplitude, 0, t_zones*sizeof(AED_REAL));
+            sed_temp_amplitude = calloc(t_zones, sizeof(AED_REAL));
         }
         if (sed_temp_peak_doy == NULL) {
-            sed_temp_peak_doy = malloc(t_zones*sizeof(AED_REAL));
-            memset(sed_temp_peak_doy, 0, t_zones*sizeof(AED_REAL));
+            sed_temp_peak_doy = calloc(t_zones, sizeof(AED_REAL));
         }
     }
 
@@ -954,8 +949,7 @@ for (i = 0; i < n_zones; i++) {
     // This is where we could map inflow, met and csv_output vars to wq vars
 
     if ( ! WQ_VarsIdx ) {
-        WQ_VarsIdx = malloc(sizeof(int)*inflow_varnum);
-        for (j = 0; j < inflow_varnum; j++) WQ_VarsIdx[j] = -1;
+        WQ_VarsIdx = calloc(inflow_varnum, sizeof(int));
     }
     if ( wq_calc ) {
         /* The first 3 vars are flow, temp and salt */
@@ -1025,14 +1019,10 @@ void create_lake(int namlst)
 
     int kar;                     // first layer with a positive area
     int ksto;                    // first layer with a positive storage
-#ifndef _VISUAL_C_
-    // The visual c compiler doesn't like this so must malloc manually
-    AED_REAL alpha_b[MaxLayers]; // interpolation coefficient for volume
-    AED_REAL beta_b[MaxLayers];  // interpolation coefficient for area
-#else
+
     AED_REAL *alpha_b;           // interpolation coefficient for volume
     AED_REAL *beta_b;            // interpolation coefficient for area
-#endif
+
     int lanext;                  // temporary counter for interpolating area
     int lvnext;                  // temporary counter for interpolating volume
     AED_REAL x, y;
@@ -1091,15 +1081,15 @@ void create_lake(int namlst)
         exit(1);
     }
 
-    Lake = malloc(sizeof(LakeDataType)*MaxLayers);
-    memset(Lake, 0, sizeof(LakeDataType)*MaxLayers);
+    Lake = calloc(MaxLayers, sizeof(LakeDataType));
+
     for (i = 0; i < MaxLayers; i++) Lake[i].ExtcCoefSW = Kw;
 
     Base = H[0];
     ksto = 0;
     kar = 0;
 
-    if ( V == NULL ) V = malloc(sizeof(AED_REAL)*bsn_vals);
+    if ( V == NULL ) V = calloc(bsn_vals, sizeof(AED_REAL));
     V[0] = 0.;
     for (b = 1; b < bsn_vals; b++) {
         if ( (A[b] < A[b-1]) || (H[b] < H[b-1]) ) {
@@ -1150,10 +1140,9 @@ void create_lake(int namlst)
     LenAtCrest = bsn_len;
     WidAtCrest = bsn_wid;
 
-#ifdef _VISUAL_C_
-    alpha_b = malloc(sizeof(AED_REAL) * MaxLayers);
-    beta_b = malloc(sizeof(AED_REAL) * MaxLayers);
-#endif
+    alpha_b = calloc(MaxLayers, sizeof(AED_REAL));
+    beta_b = calloc(MaxLayers, sizeof(AED_REAL));
+
     // Loop from the bottom to top of the provided depth points given in
     // &morphometry to calculate the bathymetric interpolation coefficients,
     // "a" and "b", at each level
@@ -1267,9 +1256,7 @@ void create_lake(int namlst)
 //  if ( A != NULL ) free(A);
 //  if ( H != NULL ) free(H);
 
-#ifdef _VISUAL_C_
     free(alpha_b); free(beta_b);
-#endif
 }
 
 
@@ -1361,7 +1348,7 @@ void initialise_lake(int namlst)
 
     // First map the wq state var names to their indices
     if ( num_wq_vars > 0 ) {
-        idx = malloc(sizeof(int)*num_wq_vars);
+        idx = calloc(num_wq_vars, sizeof(int));
         for (j = 0; j < num_wq_vars; j++) {
             size_t k =  strlen(wq_names[j]);
             if ((idx[j] = wq_var_index_c(wq_names[j], &k)) < 0)

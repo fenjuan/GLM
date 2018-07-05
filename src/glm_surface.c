@@ -171,34 +171,16 @@ void do_surface_thermodynamics(int jday, int iclock, int LWModel,
 //  int nband = 4;
     int npoint = 10;
 
-#ifndef _VISUAL_C_
-    // The visual c compiler on doesn't like this so must malloc manually
-    AED_REAL LayerThickness[MaxLayers],     //# Layer thickness (m)
-             heat[MaxLayers];
-    int layer_zone[MaxLayers];
-
-//  AED_REAL energy[nband];
-//  AED_REAL absorb[nband];
-    AED_REAL gx[MaxLayers];
-//  AED_REAL depths[MaxLayers];
-
-#else
     AED_REAL *LayerThickness;
     AED_REAL *heat;
     int *layer_zone;
 
-    //AED_REAL **solar;
-//  AED_REAL *energy;
-//  AED_REAL *absorb;
     AED_REAL *gx;
-//  AED_REAL *depths;
-#endif
 
     AED_REAL p_atm;          //# Atmospheric pressure in hectopascals, eg. 101300 Pa
     AED_REAL rho_air, rho_o; //# atm_density
     AED_REAL SatVap_surface; //# Saturated vapour pressure at surface layer or top ice layer
     AED_REAL altitude;
-//  AED_REAL c_gas_m;
     AED_REAL latent_heat_vap;
 
     AED_REAL WindSp;         //# Wind speed corrected by multiplicative factor
@@ -292,19 +274,13 @@ void do_surface_thermodynamics(int jday, int iclock, int LWModel,
     * Now get ready for surface heating
     ***********************************************************************/
 
-#ifdef _VISUAL_C_
-    LayerThickness = malloc(sizeof(AED_REAL) * MaxLayers);
-    heat = malloc(sizeof(AED_REAL) * MaxLayers);
-    layer_zone = malloc(sizeof(int) * MaxLayers);
-//  energy = malloc(sizeof(AED_REAL) * nband);
-//  absorb = malloc(sizeof(AED_REAL) * nband);
-    gx = malloc(sizeof(AED_REAL) * MaxLayers);
-#endif
+    LayerThickness = calloc(MaxLayers, sizeof(AED_REAL));
+    heat = calloc(MaxLayers, sizeof(AED_REAL));
+    layer_zone = calloc(MaxLayers, sizeof(int));
+    gx = calloc(MaxLayers, sizeof(AED_REAL));
 
     Q_longwave = 0.;
     SurfData.Evap = 0.;
-    memset(heat, 0, sizeof(AED_REAL)*MaxLayers);
-    memset(layer_zone, 0, sizeof(int)*MaxLayers);
 
     SUMPO4 = 0.0;
     SUMTP = 0.0;
@@ -442,7 +418,6 @@ void do_surface_thermodynamics(int jday, int iclock, int LWModel,
 
     //# Summarise total daily short wave radiation (J/day), stored for lake.csv
     SurfData.dailyQsw += Lake[surfLayer].LayerArea * Q_shortwave * noSecs;
-
 
 
     // ---- MH TEST SOLPOND IN PROGRESS ---- //
@@ -610,7 +585,6 @@ void do_surface_thermodynamics(int jday, int iclock, int LWModel,
             }
         }
 
-
         //# Archmides principle for the weight of Snow sitting on Ice -
         //  when the weight of snow exceeds the buoyancy of the ice
         //  cover, the ice will crack, and surface water will seep into snow
@@ -652,7 +626,6 @@ void do_surface_thermodynamics(int jday, int iclock, int LWModel,
         SUMSI  = SUMSI  + 0.0   + MetData.RainConcSi  * MetData.Rain ;
 
     }  // end iclock == 0 && ice
-
 
     /**********************************************************************
      * NON-PENETRATIVE HEAT FLUXES
@@ -940,7 +913,6 @@ void do_surface_thermodynamics(int jday, int iclock, int LWModel,
        SurfData.dailyQlw += Q_longwave * Lake[surfLayer].LayerArea * noSecs;
     }
 
-
     /**********************************************************************
      * APPLY HEATING TO WATER LAYERS
      * Now look at the ice or water interface
@@ -989,7 +961,6 @@ void do_surface_thermodynamics(int jday, int iclock, int LWModel,
       dTemp = heat[onshoreLayer]*noSecs/(SPHEAT*onshoreDensity*onshoreVol);
       Lake[onshoreLayer].Temp += dTemp;
     }
-
 
     /**********************************************************************
      * ICE MELTING & FREEZING @ BOTTOM
@@ -1122,7 +1093,6 @@ void do_surface_thermodynamics(int jday, int iclock, int LWModel,
        }
     }
 
-
     /**************************************************************************
      * SURFACE MASS FLUXES (NO ICE)
      * Precipitation, evaporation in the absence of ice
@@ -1193,13 +1163,9 @@ void do_surface_thermodynamics(int jday, int iclock, int LWModel,
     }
     SurfData.RhoSnow = rho_snow;
 
-#ifdef _VISUAL_C_
     free(LayerThickness);  free(heat);  free(layer_zone);
 
-//  free(energy); free(absorb); free(gx);
     free(gx);
-#endif
-
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
@@ -1949,29 +1915,23 @@ static double fdif(double rindex, double critw, double h, double cmu, int n)
 // Not currently used ?
 static void soiltemp(int m, double wv)
 {
-#ifndef _VISUAL_C_
-    // The visual c compiler doesn't like this so must malloc manually
-    AED_REAL  w[m+1],t[m+1],tn[m+1],k[m+1],cp[m],a[m+1],b[m],c[m],d[m],z[m+1];
-#else
     AED_REAL *w, *t, *tn, *k, *cp, *a, *b, *c, *d, *z;
-#endif
+
     int ta = 20, am = 15, bd = 1.3, tb = 20;
     int i;
 
     AED_REAL ti, dt, da, f, g, mc, c1, c2, c3, c4;
 
-#ifdef _VISUAL_C_
-    w =  malloc(sizeof(AED_REAL) * (m+1));
-    t =  malloc(sizeof(AED_REAL) * (m+1));
-    tn = malloc(sizeof(AED_REAL) * (m+1));
-    k =  malloc(sizeof(AED_REAL) * (m+1));
-    cp = malloc(sizeof(AED_REAL) * m);
-    a =  malloc(sizeof(AED_REAL) * (m+1));
-    b =  malloc(sizeof(AED_REAL) * m);
-    c =  malloc(sizeof(AED_REAL) * m);
-    d =  malloc(sizeof(AED_REAL) * m);
-    z =  malloc(sizeof(AED_REAL) * (m+1));
-#endif
+    w =  calloc((m+1), sizeof(AED_REAL) );
+    t =  calloc((m+1), sizeof(AED_REAL) );
+    tn = calloc((m+1), sizeof(AED_REAL) );
+    k =  calloc((m+1), sizeof(AED_REAL) );
+    cp = calloc(m,     sizeof(AED_REAL) );
+    a =  calloc((m+1), sizeof(AED_REAL) );
+    b =  calloc(m,     sizeof(AED_REAL) );
+    c =  calloc(m,     sizeof(AED_REAL) );
+    d =  calloc(m,     sizeof(AED_REAL) );
+    z =  calloc((m+1), sizeof(AED_REAL) );
 
     k[0] = 20;    // boundary layer conductance in w/(m^2 k)
 
@@ -2022,10 +1982,9 @@ static void soiltemp(int m, double wv)
             t[i] = tn[i];
         }
     } while (da < 5);
-#ifdef _VISUAL_C_
+
     free(w); free(t); free(tn); free(k); free(cp);
     free(a); free(b); free(c);  free(d); free(z);
-#endif
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 #endif

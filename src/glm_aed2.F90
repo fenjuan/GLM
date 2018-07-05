@@ -39,11 +39,6 @@
 
 #include "glm.h"
 
-#undef DEBUG
-#define DEBUG 2
-
-#define _NO_ODE_ 1
-
 #ifdef __GFORTRAN__
 #  if __GNUC__ < 8
 #    error   "You will need gfortran version 8 or better"
@@ -215,7 +210,8 @@ SUBROUTINE aed2_set_flags(c_split_factor, c_mobility, c_bioshade,              &
 !ARGUMENTS
    CLOGICAL,INTENT(in) :: c_mobility, c_bioshade, c_repair_state, c_do_plots
    CINTEGER,INTENT(in) :: c_split_factor, c_ode, c_benthic_mode
-   CLOGICAL,OPTIONAL,INTENT(in) :: c_link_rain_loss, c_link_solar_shade, c_link_bottom_drag
+!  CLOGICAL,OPTIONAL,INTENT(in) :: c_link_rain_loss, c_link_solar_shade, c_link_bottom_drag
+   CLOGICAL,INTENT(in) :: c_link_rain_loss, c_link_solar_shade, c_link_bottom_drag
 !
 !-------------------------------------------------------------------------------
 !BEGIN
@@ -226,9 +222,12 @@ SUBROUTINE aed2_set_flags(c_split_factor, c_mobility, c_bioshade,              &
    repair_state = c_repair_state
    benthic_mode = c_benthic_mode
    do_plots = c_do_plots
-   IF (PRESENT(c_link_rain_loss))   link_rain_loss = c_link_rain_loss
-   IF (PRESENT(c_link_solar_shade)) link_solar_shade = c_link_solar_shade
-   IF (PRESENT(c_link_bottom_drag)) link_bottom_drag = c_link_bottom_drag
+!  IF (PRESENT(c_link_rain_loss))   link_rain_loss = c_link_rain_loss
+!  IF (PRESENT(c_link_solar_shade)) link_solar_shade = c_link_solar_shade
+!  IF (PRESENT(c_link_bottom_drag)) link_bottom_drag = c_link_bottom_drag
+   link_rain_loss = c_link_rain_loss
+   link_solar_shade = c_link_solar_shade
+   link_bottom_drag = c_link_bottom_drag
 END SUBROUTINE aed2_set_flags
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -293,15 +292,15 @@ SUBROUTINE aed2_init_glm(i_fname,len,MaxLayers,NumWQ_Vars,NumWQ_Ben,pKw) BIND(C,
 
    n_aed2_vars = aed2_core_status(n_vars, n_vars_ben, n_vars_diag, n_vars_diag_sheet)
 
-!#if DEBUG
-!   DO i=1,n_aed2_vars
-!      IF ( aed2_get_var(i, tvar) ) THEN
-!         print *,"AED2 var ", i, tvar%sheet, tvar%diag, tvar%extern, TRIM(tvar%name)
-!      ELSE
-!         print *,"AED2 var ", i, " is empty"
-!      ENDIF
-!   ENDDO
-!#endif
+#if DEBUG
+   DO i=1,n_aed2_vars
+      IF ( aed2_get_var(i, tvar) ) THEN
+         print *,"AED2 var ", i, tvar%sheet, tvar%diag, tvar%extern, TRIM(tvar%name)
+      ELSE
+         print *,"AED2 var ", i, " is empty"
+      ENDIF
+   ENDDO
+#endif
 
    print "(/,5X,'AED2 : n_aed2_vars = ',I3,' ; MaxLayers         = ',I4)",n_aed2_vars,MaxLayers
    print "(  5X,'AED2 : n_vars      = ',I3,' ; n_vars_ben        = ',I3)",n_vars,n_vars_ben
@@ -532,7 +531,8 @@ SUBROUTINE aed2_set_glm_data(Lake, MaxLayers, MetData, SurfData, dt_,          &
    TYPE(MetDataType),TARGET     :: MetData  !# Meteorological data
    TYPE(SurfaceDataType),TARGET :: SurfData !# Surface Data
    AED_REAL,INTENT(in)  :: dt_
-   AED_REAL,OPTIONAL,TARGET :: c_rain_factor, c_sw_factor, c_friction
+!  AED_REAL,OPTIONAL,TARGET :: c_rain_factor, c_sw_factor, c_friction
+   AED_REAL,TARGET :: c_rain_factor, c_sw_factor, c_friction
 !LOCALS
    INTEGER :: i
 !
@@ -581,9 +581,12 @@ SUBROUTINE aed2_set_glm_data(Lake, MaxLayers, MetData, SurfData, dt_,          &
    !# Calculate and save internal time step.
    dt_eff = dt/FLOAT(split_factor)
 
-   IF (PRESENT(c_rain_factor)) rain_factor => c_rain_factor
-   IF (PRESENT(c_sw_factor))   sw_factor   => c_sw_factor
-   IF (PRESENT(c_friction))    friction    => c_friction
+!  IF (PRESENT(c_rain_factor)) rain_factor => c_rain_factor
+!  IF (PRESENT(c_sw_factor))   sw_factor   => c_sw_factor
+!  IF (PRESENT(c_friction))    friction    => c_friction
+   rain_factor => c_rain_factor
+   sw_factor   => c_sw_factor
+   friction    => c_friction
 
    !# Trigger an error if WQ hasn't got all it needs from us.
    CALL check_data
@@ -848,6 +851,7 @@ SUBROUTINE calculate_fluxes(column, wlev, column_sed, nsed, flux_pel, flux_atm, 
    flux_pel = zero_
    flux_atm = zero_
    flux_ben = zero_
+   flux_zon = zero_
 
    !# Start with calculating all flux terms for rhs in mass/m3/s
    !# Includes (1) benthic flux, (2) surface exchange and (3) water column kinetics
@@ -1009,10 +1013,16 @@ SUBROUTINE check_states(column, wlev)
 !
 !LOCALS
    TYPE(aed2_variable_t),POINTER :: tv
-   INTEGER i,v,lev
+   INTEGER :: i,v,lev
+#if DEBUG
+   INTEGER :: last_naned
+#endif
 !
 !-------------------------------------------------------------------------------
 !BEGIN
+#if DEBUG
+   last_naned = -1
+#endif
    DO lev=1, wlev
       CALL aed2_equilibrate(column, lev)    !MH this should be in the main do_glm routine ????!!!
       v = 0
@@ -1021,6 +1031,9 @@ SUBROUTINE check_states(column, wlev)
             IF ( .NOT. (tv%diag .OR. tv%extern) ) THEN
                v = v + 1
                IF ( repair_state ) THEN
+#if DEBUG
+                  IF ( isnan(cc(lev, v)) ) last_naned = i
+#endif
                   IF ( .NOT. isnan(min_(v)) ) THEN
                      IF ( cc(lev, v) < min_(v) ) cc(lev, v) = min_(v)
                   ENDIF
@@ -1032,6 +1045,17 @@ SUBROUTINE check_states(column, wlev)
          ENDIF
       ENDDO
    ENDDO
+
+#if DEBUG
+   IF ( last_naned > -1 ) THEN
+      IF ( aed2_get_var(last_naned, tv) ) THEN
+         print*,"NaNs detected in CC in var ", TRIM(tv%name)
+      ELSE
+         print*,"NaNs detected in CC unidentified var"
+      ENDIF
+      STOP
+   ENDIF
+#endif
 END SUBROUTINE check_states
 !+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
@@ -1061,13 +1085,6 @@ SUBROUTINE aed2_do_glm(wlev, pIce) BIND(C, name=_WQ_DO_GLM)
    AED_REAL :: flux_ben(n_vars+n_vars_ben), flux_atm(n_vars+n_vars_ben)
    AED_REAL :: flux(wlev, n_vars+n_vars_ben)
    AED_REAL :: flux_zone(n_zones, n_vars+n_vars_ben)
-#if !_NO_ODE_
-   AED_REAL :: flux2(wlev, n_vars), flux3(wlev, n_vars), flux4(wlev, n_vars)
-   AED_REAL :: cc1(wlev, n_vars)
-   TYPE (aed2_column_t) :: column2(n_aed2_vars)
-   TYPE (aed2_column_t) :: column3(n_aed2_vars)
-   TYPE (aed2_column_t) :: column4(n_aed2_vars)
-#endif
 !
 !-------------------------------------------------------------------------------
 !BEGIN
@@ -1100,7 +1117,8 @@ SUBROUTINE aed2_do_glm(wlev, pIce) BIND(C, name=_WQ_DO_GLM)
    pres(1:wlev) = -z(1:wlev)
 
    CALL define_column(column, wlev, cc, cc_diag, flux, flux_atm, flux_ben)
-   IF (benthic_mode .GT. 1) CALL define_sed_column(column_sed, n_zones, flux, flux_atm, flux_ben)
+   IF (benthic_mode .GT. 1) &
+      CALL define_sed_column(column_sed, n_zones, flux, flux_atm, flux_ben)
 
    cc_diag = 0.
    cc_diag_hz = 0.
@@ -1145,7 +1163,6 @@ SUBROUTINE aed2_do_glm(wlev, pIce) BIND(C, name=_WQ_DO_GLM)
       uvb(:) = (par(:)/0.45) * 0.005
 
       !# Time-integrate one biological time step
-#if _NO_ODE_
       CALL calculate_fluxes(column, wlev, column_sed, n_zones,  &
                                   flux(:,:), flux_atm, flux_ben, flux_zone(:,:))
       ! Update the water column layers
@@ -1169,10 +1186,10 @@ SUBROUTINE aed2_do_glm(wlev, pIce) BIND(C, name=_WQ_DO_GLM)
             cc(1, v) = cc(1, v) + dt_eff*flux_ben(v)
          ENDDO
       ENDIF
-#endif
-      ! If simulating sediment zones, distribute cc-sed benthic properties back
-      !  into main cc array, mainly for plotting
-      IF ( benthic_mode .GT. 1 ) CALL copy_from_zone(cc, cc_diag, cc_diag_hz, wlev)
+
+      ! Distribute cc-sed benthic properties back into main cc array
+      IF ( benthic_mode .GT. 1 ) &
+         CALL copy_from_zone(cc, cc_diag, cc_diag_hz, wlev)
 
       CALL check_states(column, wlev)
    ENDDO
@@ -1414,7 +1431,7 @@ CINTEGER FUNCTION aed2_var_index_c(name, len) BIND(C, name=_WQ_VAR_INDEX_C)
    CSIZET,INTENT(in)     :: len
 !LOCALS
    CHARACTER(len=len+1) :: tn
-   INTEGER              :: i
+   CSIZET               :: i
 !BEGIN
    tn = ''
    DO i=1,len

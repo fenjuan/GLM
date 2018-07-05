@@ -26,7 +26,7 @@ fi
 
 echo $FC
 if [ "$FC" = "ifort" ] ; then
-   # for fabm   
+   # for fabm
    FORTRAN_COMPILER="IFORT"
 
    if [ `uname -m` = "i686" ] ; then

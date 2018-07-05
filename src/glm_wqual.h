@@ -44,7 +44,8 @@ typedef void (*wq_init_glm_output_t)(int *ncid, int *x_dim, int *y_dim, int *z_d
 typedef void (*wq_write_glm_t)(int *ncid, int *wlev, int *nlev, int *lvl, int *point_nlevs);
 typedef int  (*wq_var_index_c_t)(const char*name, size_t *len);
 typedef void (*wq_set_flags_t)(int *split_factor, CLOGICAL *mobility, CLOGICAL *bioshade,
-                 CLOGICAL *repair_state, int *ode_method, int *benthic_mode, CLOGICAL *do_plots, ...);
+                 CLOGICAL *repair_state, int *ode_method, int *benthic_mode, CLOGICAL *do_plots,
+                      CLOGICAL *c_link_rain_loss, CLOGICAL *c_link_solar_shade, CLOGICAL *c_link_bottom_drag);
 typedef int (*wq_is_var_t)(int *id, const char *v, size_t *len);
 typedef void (*wq_set_glm_zones_t)(AED_REAL *z_heights, int *numZones, int *numVars, int *numBenV);
 
@@ -84,7 +85,8 @@ void wq_init_glm_output(int *ncid, int *x_dim, int *y_dim, int *z_dim, int *zone
 void wq_write_glm_(int *ncid, int *wlev, int *nlev, int *lvl, int *point_nlevs);
 int  wq_var_index_c(const char*name, size_t *len);
 void wq_set_flags(int *split_factor, CLOGICAL *mobility, CLOGICAL *bioshade, CLOGICAL *repair_state,
-                      int *ode_method, int *benthic_mode, CLOGICAL *do_plots, ...);
+                      int *ode_method, int *benthic_mode, CLOGICAL *do_plots,
+                      CLOGICAL *c_link_rain_loss, CLOGICAL *c_link_solar_shade, CLOGICAL *c_link_bottom_drag);
 int wq_is_var(int *id, const char *v, size_t *len);
 #else
 void fabm_init_glm(char *fname, size_t *len, int *kk, int *NumWQVars, int *NumWQBen, AED_REAL *pKw);

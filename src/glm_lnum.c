@@ -69,27 +69,21 @@ AED_REAL calculate_lake_number(void)
 {
     int  NLayers;
     AED_REAL wind_speed;
-#ifndef _VISUAL_C_
-    AED_REAL density[Nmorph], iheight[Nmorph];
-#else
+
     AED_REAL *density, *iheight;
-#endif
+
     AED_REAL lake_top, lake_bottom;
     AED_REAL usquared, thermdepth;
     AED_REAL xp, zc, xmass;
 
 /*----------------------------------------------------------------------------*/
-#ifdef _VISUAL_C_
-    density = malloc(sizeof(AED_REAL) * Nmorph);
-    iheight = malloc(sizeof(AED_REAL) * Nmorph);
-#endif
+    density = calloc(Nmorph, sizeof(AED_REAL));
+    iheight = calloc(Nmorph, sizeof(AED_REAL));
 
     NLayers = interpolate_layer_data(iheight, density);
 
     if (NLayers < 1) {
-#ifdef _VISUAL_C_
         free(density); free(iheight);
-#endif
         return missing;
     }
 
@@ -100,9 +94,7 @@ AED_REAL calculate_lake_number(void)
     XMoment1 = calc_xmoment(NLayers, iheight, density);
 
     if (XMoment1 <= 0.0) {
-#ifdef _VISUAL_C_
         free(density); free(iheight);
-#endif
         return 0.0;
     }
 
@@ -117,9 +109,7 @@ AED_REAL calculate_lake_number(void)
     lake_bottom = 1000 * usquared * pow(MphLevelArea[(NLayers-1)+1] , 1.5) *
                                                       (1.0 - (zc / iheight[NLayers-1]));
 
-#ifdef _VISUAL_C_
     free(density); free(iheight);
-#endif
 
     if (lake_bottom == 0.0)
         return missing;
@@ -258,19 +248,14 @@ void lnpe3(int NLayers, AED_REAL *iheight, AED_REAL *density, AED_REAL *xpp,
 /*############################################################################*/
 static AED_REAL calc_xmoment(int NLayers, AED_REAL *iheight, AED_REAL *density)
 {
-#ifndef _VISUAL_C_
-    AED_REAL BFSQ[Nmorph], mid_depth[Nmorph];
-#else
     AED_REAL *BFSQ, *mid_depth;
-#endif
+
     AED_REAL XMom, XMomO;
     int i;
 
 /*-----------------------------------------------------------------------------*/
-#ifdef _VISUAL_C_
-    BFSQ = malloc(sizeof(AED_REAL) * Nmorph);
-    mid_depth = malloc(sizeof(AED_REAL) * Nmorph);
-#endif
+    BFSQ = calloc(Nmorph, sizeof(AED_REAL));
+    mid_depth = calloc(Nmorph, sizeof(AED_REAL));
 
     XMom = 0.0;
     XMomO = 0.0;
@@ -291,9 +276,7 @@ static AED_REAL calc_xmoment(int NLayers, AED_REAL *iheight, AED_REAL *density)
     else
         XMom = XMom / XMomO;
 
-#ifdef _VISUAL_C_
     free(BFSQ); free(mid_depth);
-#endif
 
     return XMom;
 }
