@@ -279,10 +279,10 @@ void write_diags(int jday, AED_REAL LakeNum)
 
     write_csv_lake("time",            0.0,                       ts,   FALSE);
     write_csv_lake("Volume",          sum_lake_layervol(),       NULL, FALSE);
-    write_csv_lake("Vol Snow",        SurfData.HeightSnow * Lake[surfLayer].LayerArea * SurfData.RhoSnow/1000.0,     NULL, FALSE);
+    write_csv_lake("Vol Snow",        SurfData.delzSnow*Lake[surfLayer].LayerArea*SurfData.RhoSnow/1e3, NULL, FALSE);
     //Magic numbers for ice density are from glm_surface.c
-    write_csv_lake("Vol Blue Ice",    SurfData.HeightBlueIce * Lake[surfLayer].LayerArea * 917.0/1000.0, NULL, FALSE);
-    write_csv_lake("Vol White Ice",   SurfData.HeightWhiteIce * Lake[surfLayer].LayerArea * 890.0/1000.0, NULL, FALSE);
+    write_csv_lake("Vol Blue Ice",    SurfData.delzBlueIce*Lake[surfLayer].LayerArea*917.0/1e3, NULL, FALSE);
+    write_csv_lake("Vol White Ice",   SurfData.delzWhiteIce*Lake[surfLayer].LayerArea*890.0/1e3, NULL, FALSE);
     write_csv_lake("Tot Inflow Vol",  SurfData.dailyInflow,      NULL, FALSE);
     write_csv_lake("Tot Outflow Vol", SurfData.dailyOutflow,     NULL, FALSE);
     write_csv_lake("Overflow Vol",    SurfData.dailyOverflow,    NULL, FALSE);
@@ -292,31 +292,31 @@ void write_diags(int jday, AED_REAL LakeNum)
     write_csv_lake("Snowfall",        SurfData.dailySnow,        NULL, FALSE);
     write_csv_lake("Lake Level",      lake_level,                NULL, FALSE);
     write_csv_lake("Surface Area",    Lake[surfLayer].LayerArea, NULL, FALSE);
-    write_csv_lake("Blue Ice",        SurfData.HeightBlueIce,    NULL, FALSE);
-    write_csv_lake("White Ice",       SurfData.HeightWhiteIce,   NULL, FALSE);
-    write_csv_lake("Snow Height",     SurfData.HeightSnow,       NULL, FALSE);
+    write_csv_lake("Blue Ice Thickness", SurfData.delzBlueIce,      NULL, FALSE);
+    write_csv_lake("White Ice Thickness",SurfData.delzWhiteIce,     NULL, FALSE);
+    write_csv_lake("Snow Thickness",  SurfData.delzSnow,         NULL, FALSE);
     write_csv_lake("Snow Density",    SurfData.RhoSnow,          NULL, FALSE);
-    write_csv_lake("Albedo",          SurfData.albedo*(noSecs/(SecsPerDay/2.)),           NULL, FALSE);
+    write_csv_lake("Albedo",          SurfData.albedo*(noSecs/(SecsPerDay/2.)), NULL, FALSE);
     write_csv_lake("Max Temp",        max_temp(Lake, NumLayers), NULL, FALSE);
     write_csv_lake("Min Temp",        min_temp(Lake, NumLayers), NULL, FALSE);
     write_csv_lake("Surface Temp",    Lake[surfLayer].Temp,      NULL, FALSE);
-    write_csv_lake("Daily Qsw",       SurfData.dailyQsw / Lake[surfLayer].LayerArea/SecsPerDay,         NULL, FALSE);
-    write_csv_lake("Daily Qe",        SurfData.dailyQe / Lake[surfLayer].LayerArea/SecsPerDay,          NULL, FALSE);
-    write_csv_lake("Daily Qh",        SurfData.dailyQh / Lake[surfLayer].LayerArea/SecsPerDay,          NULL, FALSE);
-    write_csv_lake("Daily Qlw",       SurfData.dailyQlw / Lake[surfLayer].LayerArea/SecsPerDay,         NULL, FALSE);
+    write_csv_lake("Daily Qsw",       SurfData.dailyQsw / Lake[surfLayer].LayerArea/SecsPerDay, NULL, FALSE);
+    write_csv_lake("Daily Qe",        SurfData.dailyQe / Lake[surfLayer].LayerArea/SecsPerDay, NULL, FALSE);
+    write_csv_lake("Daily Qh",        SurfData.dailyQh / Lake[surfLayer].LayerArea/SecsPerDay, NULL, FALSE);
+    write_csv_lake("Daily Qlw",       SurfData.dailyQlw / Lake[surfLayer].LayerArea/SecsPerDay, NULL, FALSE);
     write_csv_lake("Light",           Lake[surfLayer].Light,     NULL, FALSE);
     write_csv_lake("Benthic Light",   Benthic_Light_pcArea,      NULL, FALSE);
 
-    write_csv_lake("H_s",             Hs,                        NULL, FALSE);
-    write_csv_lake("L",               L,                         NULL, FALSE);
-    write_csv_lake("T",               T,                         NULL, FALSE);
+    write_csv_lake("Surface Wave Height",Hs,                     NULL, FALSE);
+    write_csv_lake("Surface Wave Length",L,                      NULL, FALSE);
+    write_csv_lake("Surface Wave Period",T,                      NULL, FALSE);
 
     write_csv_lake("LakeNumber",      LakeNum,                   NULL, FALSE);
     write_csv_lake("Max dT/dz",    max_dtdz_at(Lake, NumLayers), NULL, FALSE);
     write_csv_lake("CD",              coef_wind_drag,            NULL, FALSE);
-    write_csv_lake("CH",              coef_wind_chwn,            NULL, FALSE);
-    write_csv_lake("z/L",             SurfData.dailyzonL*(noSecs/SecsPerDay), NULL, FALSE);
-    write_csv_lake("coef_wind_drag",  coef_wind_drag,            NULL, TRUE);
+    write_csv_lake("CHE",              coef_wind_chwn,            NULL, FALSE);
+    write_csv_lake("z/L",             SurfData.dailyzonL*(noSecs/SecsPerDay), NULL, TRUE);
+//    write_csv_lake("coef_wind_drag",  coef_wind_drag,            NULL, TRUE);
 
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/

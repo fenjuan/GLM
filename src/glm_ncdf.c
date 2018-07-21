@@ -226,9 +226,9 @@ void write_glm_ncdf(int ncid, int wlev, int nlev, int stepnum, AED_REAL timestep
     //# Time varying data : t
     /*------------------------------------------------------------------------*/
     store_nc_scalar(ncid,  time_id, T_SHAPE, temp_time);
-    store_nc_scalar(ncid,  HICE_id, T_SHAPE, SurfData.HeightBlueIce);
-    store_nc_scalar(ncid, HWICE_id, T_SHAPE, SurfData.HeightWhiteIce);
-    store_nc_scalar(ncid, HSNOW_id, T_SHAPE, SurfData.HeightSnow);
+    store_nc_scalar(ncid,  HICE_id, T_SHAPE, SurfData.delzBlueIce);
+    store_nc_scalar(ncid, HWICE_id, T_SHAPE, SurfData.delzWhiteIce);
+    store_nc_scalar(ncid, HSNOW_id, T_SHAPE, SurfData.delzSnow);
 
     store_nc_scalar(ncid, precip_id, XYT_SHAPE, MetData.Rain);
     store_nc_scalar(ncid,   evap_id, XYT_SHAPE, SurfData.Evap);

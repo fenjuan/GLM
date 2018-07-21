@@ -105,22 +105,22 @@ MODULE glm_types
    !# Structured type for Surface Data vars
    TYPE,BIND(C) :: SurfaceDataType
       AED_REAL :: Evap             !# Evaporation
-      AED_REAL :: HeightBlueIce   !# height of ice layer
-      AED_REAL :: HeightWhiteIce   !# height of white ice layer
-      AED_REAL :: HeightSnow       !# height of snow layer
-      AED_REAL :: dHt              !# change in thickness of either the snow or ice layer
-      AED_REAL :: RhoSnow          !# Density of snow layer in kg/m^3
-      AED_REAL :: dailyEvap        !# Daily Evaporation (ML/day)
-      AED_REAL :: dailyRain        !# Daily Rain (ML/day)
+      AED_REAL :: delzBlueIce    !# Thickness of blue ice layer
+      AED_REAL :: delzWhiteIce   !# Thickness of white ice layer
+      AED_REAL :: delzSnow       !# Thickness of snow layer
+      AED_REAL :: dHt              !# Change in thickness of snow / ice layer
+      AED_REAL :: RhoSnow          !# Density of snow layer (kg/m^3)
+      AED_REAL :: dailyEvap        !# Daily Evaporation (m3/day)
+      AED_REAL :: dailyRain        !# Daily Rain (m3/day)
       AED_REAL :: dailyRunoff      !# Daily Rain (m3/day)
-      AED_REAL :: dailySnow        !# Daily Snow (ML/day)
+      AED_REAL :: dailySnow        !# Daily Snow (m3/day)
       AED_REAL :: dailyQsw         !# Daily Short Wave Radiation (J/day)
       AED_REAL :: dailyQe          !# Daily Latent Heat(J/day)
       AED_REAL :: dailyQh          !# Daily Sensible Heat (J/day)
       AED_REAL :: dailyQlw         !# Daily Long Wave Radiation (J/day)
-      AED_REAL :: dailyInflow      !# Total Daily Inflow (ML/day)
-      AED_REAL :: dailyOutflow     !# Total Daily Outflow (ML/day)
-      AED_REAL :: dailyOverflow    !# Total Daily Overflow (ML/day)
+      AED_REAL :: dailyInflow      !# Total Daily Inflow (m3/day)
+      AED_REAL :: dailyOutflow     !# Total Daily Outflow (m3/day)
+      AED_REAL :: dailyOverflow    !# Total Daily Overflow (m3/day)
       AED_REAL :: albedo           !# Daily surface albedo
       AED_REAL :: dailyzonL        !# Average z/L value, atmos stability
    END TYPE SurfaceDataType

@@ -662,6 +662,8 @@ void init_glm(int *jstart, char *outp_dir, char *outp_fn, int *nsave)
     } else
          snow_sw = TRUE;
 
+
+
     //--------------------------------------------------------------------------
     // fetch
     if ( get_namelist(namlst, fetch) ) {
@@ -1413,6 +1415,10 @@ void initialise_lake(int namlst)
         Lake[onshoreLayer].Temp = Lake[surfLayer].Temp;
         Lake[offshoreLayer].Temp = Lake[surfLayer].Temp;
     }
+
+    SurfData.delzSnow = zero;
+    SurfData.delzWhiteIce = zero;
+    SurfData.delzBlueIce = zero;
 
 }
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
