@@ -634,6 +634,7 @@ SUBROUTINE check_data
             CASE ( 'taub' )        ; tvar%found = .true.
             CASE ( 'lake_depth' )  ; tvar%found = .true.
             CASE ( 'layer_area' )  ; tvar%found = .true.
+            CASE ( 'rain' )        ; tvar%found = .true.
             CASE DEFAULT ; CALL STOPIT("ERROR: external variable "//TRIM(tvar%name)//" not found.")
          END SELECT
       ELSEIF ( tvar%diag ) THEN  !# Diagnostic variable
@@ -708,6 +709,7 @@ SUBROUTINE define_sed_column(column, top, flux_pel, flux_atm, flux_ben)
             CASE ( 'taub' )        ; column(av)%cell_sheet => bottom_stress
             CASE ( 'lake_depth' )  ; column(av)%cell_sheet => depth(1)
             CASE ( 'layer_area' )  ; column(av)%cell => zarea(:)
+            CASE ( 'rain' )        ; column(av)%cell_sheet => precip
             CASE DEFAULT ; CALL STOPIT("ERROR: external variable "//trim(tvar%name)//" not found.")
          END SELECT
       ELSEIF ( tvar%diag ) THEN  !# Diagnostic variable
@@ -786,6 +788,7 @@ SUBROUTINE define_column(column, top, cc, cc_diag, flux_pel, flux_atm, flux_ben)
             CASE ( 'taub' )        ; column(av)%cell_sheet => bottom_stress
             CASE ( 'lake_depth' )  ; column(av)%cell_sheet => depth(1)
             CASE ( 'layer_area' )  ; column(av)%cell => layer_area(:)
+            CASE ( 'rain' )        ; column(av)%cell_sheet => precip
             CASE DEFAULT ; CALL STOPIT("ERROR: external variable "//TRIM(tvar%name)//" not found.")
          END SELECT
       ELSEIF ( tvar%diag ) THEN  !# Diagnostic variable
