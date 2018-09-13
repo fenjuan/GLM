@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -18,6 +18,30 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+
+<!-- Set the PlatformToolset based on the Visual Studio Version -->
+<PropertyGroup>
+    <!-- Default to Visual Studio 2010 -->
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">4.0</VisualStudioVersion>
+</PropertyGroup>
+<!-- Visual Studio 2010 (4.0) -->
+<PropertyGroup Condition="'$(VisualStudioVersion)' == '4.0'">
+    <PlatformToolset>v100</PlatformToolset>
+</PropertyGroup>
+<!-- Visual Studio 2013 (12.0) -->
+<PropertyGroup Condition="'$(VisualStudioVersion)' == '12.0'">
+    <PlatformToolset>v120</PlatformToolset>
+</PropertyGroup>
+<!-- Visual Studio 2015 (14.0) -->
+<PropertyGroup Condition="'$(VisualStudioVersion)' == '14.0'">
+    <PlatformToolset>v140</PlatformToolset>
+</PropertyGroup>
+<!-- Visual Studio 2017 (15.0) -->
+<PropertyGroup Condition="'$(VisualStudioVersion)' == '15.0'">
+    <PlatformToolset>v141</PlatformToolset>
+</PropertyGroup>
+<!-- Set the PlatformToolset based on the Visual Studio Version -->
+
   <PropertyGroup Label="Globals">
     <ProjectGuid>{5CDBCC36-B1AF-4861-84A6-A469B8C10B2B}</ProjectGuid>
     <RootNamespace>glm</RootNamespace>
